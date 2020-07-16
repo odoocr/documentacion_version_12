@@ -123,8 +123,8 @@ logfile= $PATH_LOG/odoo$VCODE.log
 ############# addons path ######################################
 
 addons_path =
-    $PATHBASE/$VERSION/odoo/addons
-    $PATHREPOS,
+    $PATHBASE/$VERSION/odoo/addons,
+    $PATHREPOS
 
 #################################################################
 
