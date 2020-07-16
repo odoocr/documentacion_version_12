@@ -1,0 +1,203 @@
+Ultima actualización: 27-06-2020 repo odoocr/l10n_cr
+
+Abrir sesión en odoo 12 para continuar
+
+01. Activar modo desarrollador
+
+02. Ir a aplicaciones e instalar un tema (opcional)
+
+03. Instalar los módulos base y otros
+Instalar los módulos base personalizados para su instancia
+
+04. Instalación de los módulos FE CR
+	Actualizar o instalar en este orden l10n_cr_country_codes, 110n_cr, l10n_cr_hacienda_info_query, cr_electronic_invoice, cr_electronic_invoice_pos, cr_electronic_invoice_qweb_fe y por último res_currency_cr_adapter
+
+05. Configurar el usuario administrador
+	Habilitar en permisos de acceso:
+	Descuentos en lineas, tarifas de venta, multimoneda, advertencia para empresa (stock), gestionar multiples unidades de medida y otras que considere necesarias
+	En preferencias agregar la zona horaria America/Costa Rica
+
+	Duplicar el usuario admin y eliminar los permisos para usuario administrador (cliente), crear las plantillas para cajeros y contador, entre otros.
+	Configurar PIN de seguridad en la pestaña de terminal de punto de venta si es requerido
+	Hacer esto para cada usuario de la lista de acceso tpv.
+
+06. Modificar la compañia
+	Llenar tipo de identificación y el NIF, luego presionar el botón de "Consultar Actividad Económica en Hacienda", despues seleciconar la actividad económica principal a utilizar.
+	Completar la demas información de la compañía y guardar los cambios.
+	En la pestaña de FACTURA ELECTRONICA, subir la llave criptográfica, completar los datos de usuario, clave y pin
+	En AMBIENTE, seleccionar el indicado
+	*** El botón de test get token no refleja ningún dato a la vista, ni en el log ***
+	En default nomenclature agregar al patrón del código de barras las 2 o 3 primeras letras del nombre de la regla o tipo, Ej. Lot barcodes = LOT10
+
+	En TECNICO, ir a SERVIDORES DE CORREO SALIENTE, configurar la cuenta de correo con los siguientes datos:
+	DESCRIPCION: Factura (nombre del comercio)		PRIORIDAD: 10
+	SERVIDOR SMTP: datos del servidor (smtp.dominio.com)	PUERTO: 587 o 465 (ssl/tsl)
+	SEGURIDAD DE CONEXION: Ninguno o SSL
+	NOMBRE DE USUARIO: datos del usuario (correo@dominio.com)
+	CONTRASEÑA: ******
+
+07. En ajustes OPCIONES GENERALES cambiar en:
+	ACCOUNTING
+		Marcar Multi-divisas y seleccionar el origen donde tomará el tipo de cambio diario (Ej: HACIENDA)
+		Impuestos por defecto IVA Ventas 13%
+		En la sección Autocompletar facturas de proveedor seleccionar:
+			El producto por defecto (ej: Crear - COMPRA, no puede ser vendido y en compra eliminar el imp de compra)
+			La cuenta de compra por defecto (ej: Cuenta por pagar a proveedores)
+			La cuenta analitica por defecto (ej: Crear - Cta Analítica Compras)
+		Marcar "Load invoice lines" Para subir las lineas del XML de proveedor
+	OPCIONES GENERALES
+		Cambiar el tamaño de la hoja a US Letter
+		Seleccionar plantilla de documento para documentos y reportes varios, editar si es necesario
+		Seleccionar el formato deseado y editar el pie de pagina (si es necesario)
+		Correos digestos (opcional)
+		Permisos de acceso (configurar dichos permisos - opcional)
+		Reiniciar contraseña (opcional)
+
+08. IMPUESTOS
+	Ir a FACTURACION - CONFIGURACION - IMPUESTOS
+	Desactivar Sales y Purchase Tax
+	Agregar los impuestos y posiciones fiscales de SIN SERVICIO y EXONERACIONES (opcionales)
+	** Puede asignar la posición fiscal y la exoneración a los clientes que así lo requieran
+	Documentación: https://www.cybrosys.com/blog/fiscal-position-odoo-v12
+	
+	Impuesto de servicio
+	I. Crear impuesto SIN SERVICIO 10%
+		a. Crear el impuesto nombre: Sin Servicio
+		b. Código de impuesto "00"
+		c. Tarifa y código IVA dejar en N/A
+		d. Todo lo demás queda como esta y guardar
+	II. Crear posición fiscal, ir a POSICIONES FISCALES
+		a. Nombre "Sin Servicio"
+		b. En mapeo de impuestos agregar un registro
+		c. En impuesto sobre el producto, seleciconar Impuesto de Servicio
+		d. En impuestos para aplicar, seleccionar Sin Servicio
+		e. Todo lo demás queda como esta y guardar
+	
+	Exoneración (pendiente del cambio a aprtir del 01 de julio 2020)
+	I. Crear impuesto Exonerado
+		a. Nombre de impuesto IVA 13% Exonerado al (100%)
+		b. Tax Code 01
+		c. VAT Tax Rate N/A
+		d. VAT Rate Code 08
+		e. Marcar la casilla IMPUESTO EXONERADO
+		f. En la pestaña OPCIONES AVANZADAS, escribir una etiqueta (IVA 13% Exonerado)
+		g. En la pestaña EXONERATION, seleciconar el impuesto padre (IVA 13%)
+		h. En porcentaje de exoneración establecer el porcentaje que será exonerado
+		i. Todo lo demás queda como esta y guardar
+	II. Crear la posición fiscal para la exoneración
+		a. Poner el nombre Exonerado (100%) de IVA 13%
+		b. En mapeo de impuestos agregar un registro
+		c. En impuesto sobre el producto, seleccionar IVA 13%
+		d. En impuestos para aplicar, seleccionar IVA 13% Exonerado al (100%)
+		e. Todo lo demás queda como esta y guardar
+
+09. CONFIGURACION PARA FACTURACION
+	A- SECUENCIAS PARA FACTURACION
+	Ir a AJUSTES - TECNICO - SECUENCIAS
+	I. Revisar las secuencias
+		Nombre: Secuencia de Factura Electrónica (Tipo doc: 01)
+		Cod Sec: sequence.fe.pos (cambiar el nombre a gusto)
+		Prefijo: DEJAR EN BLANCO
+		Sufijo: DEJAR EN BLANCO
+		Tamaño de secuencia: 10
+		Próximo número: (aquí establecer consecutivo para FE, FEC, NC, ND, TE y FEE)
+	II. Hacer lo mismo para las siguientes secuencias cambiando número de tipo de documento y el nombre Código de Secuencia
+		Secuencia de Factura de Compra FEC (T doc: 14)
+		Secuencia de Nota Crédito Electrónica (T doc: 03)
+		Secuencia de Nota Débito Electrónica (T doc: 02)
+		Secuencia de Tiquete Electrónico (T doc: 04)
+		Secuencia de Factura Electrónica de Exportación (T doc: 09)
+
+	Ir a FACTURACION - CONFIGURACION - DIARIOS
+	I. FACTURAS DE CLIENTE
+	En la pestaña de Facturación Electrónica asignar las secuencias correspondientes (consecutivo hacienda)
+		Secuencia de Factura Electrónica
+		Secuencia de Tiquete Electrónico
+		Secuencia de Factura Electrónica de Exportación
+		Secuencia de Nota Crédito Electrónica
+		Secuencia de Nota Débito Electrónica
+		En Branch asignar el número de sucursal
+		En Terminal asignar el número correspondiente
+		Ejemplo puede usar para facturación Sucursal 1 y para terminal 1, para POS sucursal 1 terminal 2
+	En la pestaña de asientos contables (consecutivo interno)
+		Código corto: FACT
+		Asignar el próximo número (consecutivo interno)
+		Modificar los valores de INV Secuencia, cambiar nombre a FACT Secuencia, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
+		Marcar Secuencia de facturas rectificativas dedicada y asignar el número siguiente, guardar los cambios
+		Modificar los valores de FACT: Rectificación Secuencia, sustituir prefijo por: Fact.Rect/, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
+	En la pestaña de configuración avanzada
+		Marcar agrupar lineas y permitir cancelar asientos (opcional)
+	Guardar los cambios
+
+	II. FACTURAS DE PROVEEDOR
+	En la pestaña de asientos contables (consecutivo interno)
+		Código corto: FPROV
+		Asignar el próximo número
+		Modificar los valores de FPROV Secuencia, borrar prefijo, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
+		Marcar Secuencia de facturas rectificativas dedicada y asignar el número siguiente, guardar los cambios
+		Modificar los valores de FPROV: Rectificación Secuencia, borrar prefijo, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
+	En la pestaña de configuración avanzada
+		Marcar agrupar lineas y permitir cancelar asientos (opcional)
+		Configurar el servidor de correo externo (opcional para cargar las facturas de proveedor)
+	Guardar los cambios
+
+10. CONFIGURACION PARA POS
+	A- SECUENCIAS PARA POS
+	Crear las secuencias para cada terminal (CAJA)
+	Ir a AJUSTES - TECNICO - SECUENCIAS
+	I. Duplicar las secuencias de facturación
+		Nombre: Secuencia de Factura Electrónica POS (Tipo doc: 01)
+		Cod Sec: sequence.fe.pos (cambiar el nombre es opcional)
+		Prefijo: 506%(day)s%(month)s%(y)s0009099909990010000104 (000112540139 cédula, 001 sucursal, 00001 terminal, 04 tipo de documento)
+		NOTA: Si es ced jur 003101222222
+		Sufijo: 1%(h12)s%(day)s%(month)s%(y)s
+		Tamaño de secuencia 10
+		Próximo número: (aquí establecer consecutivo para FE, NC, ND, TE y FEE)
+	II. Hacer lo mismo para las siguientes secuencias cambiando número de tipo de documento
+		Secuencia de Nota Crédito Electrónica POS (T doc: 03)
+		Secuencia de Nota Débito Electrónica POS (T doc: 02)
+		Secuencia de Tiquete Electrónico POS (T doc: 04)
+		Secuencia de Factura Electrónica de Exportación POS (T doc: 09)
+
+	B- DIARIOS
+	NOTA: Crear un diario y secuencia para cada caja
+	Ir a FACTURACION - CONFIGURACION - DIARIOS
+	I. POS SALE JOURNAL
+	En la pestaña de Facturación Electrónica asignar las secuencias correspondientes (consecutivo hacienda)
+		Secuencia de Factura Electrónica POS
+		Secuencia de Tiquete Electrónico POS
+		Secuencia de Factura Electrónica de Exportación POS
+		Secuencia de Nota Crédito Electrónica POS
+		Secuencia de Nota Débito Electrónica POS
+		En Branch asignar el número de sucursal
+		En Terminal asignar el número correspondiente
+		Ejemplo puede usar para la caja 1 Sucursal 1 y para terminal 2, para la caja 2 sucursal 1 terminal 3 y así sucesivamente
+		** Verificar la sucursal y terminal en el prefijo de las secuencias de POS **
+	En la pestaña de asientos contables (consecutivo interno)
+		Código corto: FPOS
+		Asignar el próximo número
+		Modificar los valores de FPOS Secuencia, sustituir prefijo por: Caja-1/, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
+		Marcar Secuencia de facturas rectificativas dedicada y asignar el número siguiente, guardar los cambios
+		Modificar los valores de FPOS: Rectificación Secuencia, sustituir prefijo por: Rect.Caja-1/, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
+	En la pestaña de configuración avanzada
+		Marcar agrupar lineas y permitir cancelar asientos (opcional)
+	Guardar los cambios
+
+11. FORMAS DE PAGO PARA EL TPV
+	En PUNTO DE VENTA - CONFIGURACION - FORMAS DE PAGO
+	I. Crear forma de pago Efectivo POS
+	Código corto: EFPOS
+	Seleccionar las cuentas Ej: Efectivo
+	En confIguración avanzada marcar permitir cancelacion de asientos
+	Guardar cambios
+	
+	II. Crear forma de pago Tarjeta POS
+	Código corto: TJPOS
+	Seleccionar las cuentas Ej: Banco
+	En la pestaña de cuenta bancaria seleccionar la cuenta del catálogo
+	En configuración avanzada marcar permitir cancelacion de asientos
+	Guardar cambios
+
+12. Configuraciones varias
+	En moneda modificar el factor de redondeo deseado
+	En precisión decimal cambiar la cantidad de decimales por cada item según lo requiera (ej: 2 en todos y mantener 15 para currency rate)

@@ -1,0 +1,137 @@
+ODOO 12 LOCAL HOST o VPS (Desarrollo o Producción) Update 16-07-2020
+
+Instalar odoo 12 y servicios necesarios para la localización de CR
+** La guía para desinstalar odoo esta al final de este instructivo **
+
+1. Crear un servidor en su proveedor de servicios con ubuntu 18.04 a 20.04
+Actualizar ubuntu
+sudo apt-get update && sudo apt-get upgrade -y
+
+2. Instalar odoo12
+Entrar al servidor o ir a la terminal local
+Descargar el ejecutable odoo12.sh y los manuales
+sudo git clone https://github.com/odoocr/documentacion-version12.git
+
+Configurar los permisos del archivo
+sudo chmod +x odoo12.sh
+
+Ejecutar el archivo
+./odoo12.sh
+Darle Y o S y luego ENTER
+
+*** si es instalación local para desarrollo, deshabilitar el inicio automatico de odoo ***
+sudo service odoo12 stop
+sudo systemctl disable odoo12
+******************************************************************************************
+
+3. Clonar los repositorios de los módulos
+cd /opt/odoo/12.0/extra-addons
+
+Descargar los modulos de l10n_cr
+sudo git clone https://github.com/odoocr/l10n_cr.git
+
+Descargar los módulos personalizados
+sudo git clone https://github.com/su-usuario/su-repo.git
+
+4. Instalar requerimientos y utilidades
+Vaya a la carpeta donde se encuentra el archivo con los requerimientos
+cd /opt/odoo/12.0/extra-addons/l10n_cr
+
+Ejecutar
+/opt/odoo/12.0/venv/bin/pip3 install -r requirements.txt
+
+sudo apt-get install unzip
+
+5. Modificar el archivo conf de acuerdo a su ambiente
+sudo vim /opt/odoo/config/odoo12.conf
+Sustituir "vim" por el editor de texto de su elección
+
+Agregar la ruta completa de los módulos personalizados y de l10n_cr al addons_path
+
+Ejemplo:
+
+addons_path =
+    /opt/odoo/12.0/odoo/addons,
+    /opt/odoo/12.0/extra-addons,
+    /opt/odoo/12.0/extra-addons/l10n_cr,
+    /opt/odoo/12.0/extra-addons/addons_personalizados
+
+Guardar cambios y reiniciar odoo
+
+******* SOLO PARA PRODUCCION CON PROXY *******
+Instalar apache2 o nginx (opcional según sus requerimientos)
+Para este instructivo usaremos apache2
+sudo apt install apache2 -y
+a2enmod proxy
+a2enmod proxy_http
+a2enmod headers
+
+sudo service apache2 restart
+
+*Para tener varias bases de datos en la misma instancia primero hacer el direccionamiento DNS
+en su host, cloudflare o el servicio que utilice
+** Recordar que se esta usando apache2 no nginx **
+
+Agregar nuva BD
+cd /etc/apache2/sites-available/
+sudo vi COMPAÑIA.TUDOMINIO.com.conf
+
+**pegar los datos del VIRTUALHOST y modificar la compañia
+
+<VirtualHost *:80>
+        ServerName COMPAÑIA.TUDOMINIO.com
+        ServerAlias COMPAÑIA.TUDOMINIO.com
+
+        ProxyPass  / http://localhost:8069/
+        ProxyPassReverse  / http://localhost:8069/
+
+        Header add X-ODOO_DBFILTER "COMPAÑIA"
+        RequestHeader add X-ODOO_DBFILTER "COMPAÑIA"
+
+        #RewriteEngine on
+        #RewriteCond %{SERVER_NAME} =COMPAÑIA.TUDOMINIO.com
+       # RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+PARA GUARDAR Y CERRAR
+
+Habilitar sitio web en apache2
+sudo a2ensite COMPAÑIA.TUDOMINIO.com.conf
+
+Luego reiniciar apache2
+sudo service apache2 reload
+
+Para deshabilitar un sitio web en apache2
+sudo a2dissite COMPAÑIA.TUDOMINIO.com.conf
+
+** SALIR de la terminal de ubuntu
+exit y ENTER
+
+#################################################################
+
+DESINSTALAR ODOO
+* Detener servidor
+* Borrar todos los archivos de odoo o (versión)
+* Borrar postgresql
+
+DETENER EL SERVICIO DE ODOO
+  sudo service odoo12 stop
+BORRAR LOS ARCHIVOS DE ODOO
+  Borra todas las versiones
+  sudo rm -R /opt/odoo
+  Borra una versión (para multiversiones en desarrollo)
+  sudo rm -R /opt/odoo/version (ej: 12.0)
+BORRAR EL ARCHIVO CONF
+  Borra una version especifica
+  sudo rm -f /opt/odoo/version (ej: odoo12.conf)
+  sudo update-rc.d -f odoo12 remove 
+
+BORRAR USUARIO Y GRUPO
+  sudo userdel -r postgres
+  sudo groupdel postgres
+BORRAR BASE DE DATOS
+  sudo apt-get remove postgresql -y
+  sudo apt-get --purge remove postgresql\* -y
+  sudo rm -rf /etc/postgresql/
+  sudo rm -rf /etc/postgresql-common/
+  sudo rm -rf /var/lib/postgresql/
