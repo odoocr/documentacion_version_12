@@ -58,12 +58,12 @@ Instalar los módulos base personalizados para su instancia
 	Desactivar Sales y Purchase Tax
 	Agregar los impuestos y posiciones fiscales de SIN SERVICIO y EXONERACIONES (opcionales)
 	** Puede asignar la posición fiscal y la exoneración a los clientes que así lo requieran
-	Documentación: https://www.cybrosys.com/blog/fiscal-position-odoo-v12
+	** Para esto ver el punto # 13
 	
 	Impuesto de servicio
 	I. Crear impuesto SIN SERVICIO 10%
 		a. Crear el impuesto nombre: Sin Servicio
-		b. Código de impuesto "00"
+		b. Código de impuesto 00
 		c. Tarifa y código IVA dejar en N/A
 		d. Todo lo demás queda como esta y guardar
 	II. Crear posición fiscal, ir a POSICIONES FISCALES
@@ -90,6 +90,13 @@ Instalar los módulos base personalizados para su instancia
 		c. En impuesto sobre el producto, seleccionar IVA 13%
 		d. En impuestos para aplicar, seleccionar IVA 13% Exonerado al (100%)
 		e. Todo lo demás queda como esta y guardar
+	
+	Configurar en la terminal
+		a. Ir Terminal Punto de Venta - Configuración - Terminal Punto de Venta
+		b. Entrar a la terminal a configurar
+		c. En la sección de impuestos
+			Habilitar la opción de Posición fiscal por pedido
+			Luego seleccionar las exoneraciones creadas y/o Sin Servicio
 
 09. CONFIGURACION PARA FACTURACION
 	A- SECUENCIAS PARA FACTURACION
@@ -202,3 +209,15 @@ Instalar los módulos base personalizados para su instancia
 	Ir a la configuración de la terminal POS, en la sección FACTURAS Y RECIBOS, desmarcar la opción de FACTURACION (esto deshabilita el botón en POS)
 	En moneda modificar el factor de redondeo deseado
 	En precisión decimal cambiar la cantidad de decimales por cada item según lo requiera (ej: 2 en todos y mantener 15 para currency rate)
+
+13. Clientes exonerados - Establecido por default al 100% del IVA 13% - Agregar mas si es requerido
+	Crear o modificar el cliente 
+		a. Marcar la opción HAS EXONERATION (esto habilitará las opciones de la exoneración)
+		b. En la pestaña de VENTAS Y COMPRAS agregar la posición fiscal correspondiente a la exoneración
+		c. En la pestaña EXONERATION completar todos los campos según la autorización de exonet
+
+14. Configurar módulo de asistencia empleados
+	Ir a aplicaciones e instalar el módulo ASISTENCIAS
+	Hacer click en EMPLEADOS-CONFIGURACION y crear o modificar el calendario por defecto (de ser necesario establecer los horarios del cliente)
+	Hacer click en ASISTENCIAS-CONFIGURACION y marcar la opción de PIN para marcación por modo quiosco
+	Ir a EMPLEADOS y crear los empleados que marcaran la asistencia y asociarlos con los usuarios respectivos
