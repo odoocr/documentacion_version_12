@@ -3,16 +3,16 @@
 # AVISO IMPORTANTE!!! (WARNING!!!)
 # ASEGURESE DE TENER UN SERVIDOR / VPS CON AL MENOS > 2GB DE RAM
 # You must to have at least > 2GB of RAM
-# Probado en Ubuntu 18.04, 19, 20.04 LTS (tested)
+# Ubuntu 18.04, 19, 20.04 LTS tested
 # v2.2
-# Last updated: 2020-06-25
+# Last updated: 17-10-2020
 
 OS_NAME=$(lsb_release -cs)
 usuario=$USER
 DIR_PATH=$(pwd)
 VCODE=12
 VERSION=12.0
-PORT=1269
+PORT=8069
 DEPTH=1
 PROJECT_NAME=odoo
 PATHBASE=/opt/$PROJECT_NAME
@@ -47,6 +47,7 @@ sudo add-apt-repository universe
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install -y git
+
 # Update and install Postgresql
 sudo apt-get install postgresql -y
 sudo su - postgres -c "createuser -s $usuario"
@@ -57,15 +58,19 @@ sudo mkdir $PATHREPOS
 sudo mkdir $PATHREPOS_OCA
 sudo mkdir $PATH_LOG
 cd $PATHBASE
+
 # Download Odoo from git source
 sudo git clone https://github.com/odoo/odoo.git -b $VERSION --depth $DEPTH $PATHBASE/$VERSION/odoo
+sudo git clone https://github.com/odooerpdevelopers/backend_theme.git -b $VERSION --depth $DEPTH $PATHREPOS/backend_theme
+sudo git clone https://github.com/oca/web.git -b $VERSION --depth $DEPTH $PATHREPOS_OCA/web
+
 
 # Install python3 and dependencies for Odoo
 sudo apt-get -y install gcc python3-dev libxml2-dev libxslt1-dev \
  libevent-dev libsasl2-dev libldap2-dev libpq-dev \
  libpng-dev libjpeg-dev xfonts-base xfonts-75dpi
 
-sudo apt-get -y install python3 python3-pip python3-setuptools htop
+sudo apt-get -y install python3 python3-pip python3-setuptools htop unzip
 sudo pip3 install virtualenv
 
 # FIX wkhtml* dependencie Ubuntu Server 18.04
@@ -77,7 +82,7 @@ sudo ln -s /usr/bin/nodejs /usr/bin/node
 sudo npm install -g less
 
 # Download & install WKHTMLTOPDF
-sudo rm $PATHBASE/wkhtmltox*.deb
+sudo wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb $PATHBASE
 
 if [[ "`getconf LONG_BIT`" == "32" ]];
 
@@ -87,7 +92,7 @@ else
 	sudo wget $wk64
 fi
 
-sudo dpkg -i --force-depends wkhtmltox_0.12.5-1*.deb
+sudo dpkg -i --force-depends $PATHBASE/wkhtmltox_0.12.5-1*.deb
 sudo apt-get -f -y install
 sudo ln -s /usr/local/bin/wkhtml* /usr/bin
 sudo rm $PATHBASE/wkhtmltox*.deb
@@ -117,24 +122,30 @@ db_host = False
 db_port = False
 ;db_user =
 ;db_password =
-data_dir = $PATHBASE/$VERSION/data
+data_dir = $PATHBASE/data
 logfile= $PATH_LOG/odoo$VCODE.log
 
 ############# addons path ######################################
 
 addons_path =
-    $PATHBASE/$VERSION/odoo/addons,
-    $PATHREPOS
+    $PATHREPOS,
+    $PATHREPOS/backend_theme,
+    $PATHREPOS_OCA/web,
+    $PATHBASE/odoo/addons
 
 #################################################################
 
 xmlrpc_port = $PORT
-;dbfilter = odoo$VCODE
+longpolloing_port = 8072
+;dbfilter = ^%d$
+;dbfilter = .*
+;proxy_mode = True
 logrotate = True
+;workers = 5
 limit_time_real = 6000
 limit_time_cpu = 6000
-limit_memory_hard = 1677721600
-limit_memory_soft = 629145600
+limit_memory_soft = 3355443200
+limit_memory_hard = 4026531840
 " | sudo tee --append $PATHBASE/config/odoo$VCODE.conf
 
 sudo rm /etc/systemd/system/odoo$VCODE.service
