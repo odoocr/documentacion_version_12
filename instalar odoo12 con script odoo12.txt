@@ -1,4 +1,3 @@
-Instalación con entorno virtual
 ODOO 12 LOCAL HOST o VPS (Desarrollo o Producción) Update 17-10-2020
 
 Instalar odoo 12 y servicios necesarios para la localización de CR
@@ -12,14 +11,14 @@ sudo apt-get update && sudo apt-get upgrade -y
 
 2. Instalar odoo12
 Entrar al servidor o ir a la terminal local
-Descargar el ejecutable odoo12-venv.sh
+Descargar el ejecutable odoo12.sh
 sudo git clone https://github.com/odoocr/documentacion_version_12.git
 
 Configurar los permisos del archivo
-sudo chmod +x odoo12-venv.sh
+sudo chmod +x odoo12.sh
 
 Ejecutar el archivo
-./odoo12-venv.sh
+./odoo12.sh
 Darle Y o S y luego ENTER
 
 *** si es instalación local para desarrollo, deshabilitar el inicio automatico de odoo ***
@@ -28,13 +27,13 @@ sudo systemctl disable odoo12
 ******************************************************************************************
 
 3. Clonar los repositorios de los módulos
-cd /opt/odoo/12.0/extra-addons
+cd /opt/odoo12/extra-addons
 
 Descargar los modulos de l10n_cr
 sudo git clone https://github.com/odoocr/l10n_cr.git
 
 4. Instalar requerimientos de odoocr
-sudo /opt/odoo/12.0/venv/bin/pip3 install -r /opt/odoo12/extra-addons/l10n_cr/requirements.txt
+sudo pip3 install -r /opt/odoo12/extra-addons/l10n_cr/requirements.txt
 
 5. Modificar el archivo conf de acuerdo a su ambiente
 sudo vim /opt/odoo/config/odoo12.conf
@@ -45,11 +44,14 @@ Agregar la ruta completa de los módulos personalizados y de l10n_cr al addons_p
 Ejemplo:
 
 addons_path =
-    /opt/odoo/12.0/odoo/addons,
-    /opt/odoo/12.0/extra-addons,
-    /opt/odoo/12.0/extra-addons/l10n_cr
+    /opt/odoo12/odoo/addons,
+    /opt/odoo12/odoo/odoo/addons,
+    /opt/odoo12/extra-addons,
+    /opt/odoo12/extra-addons/l10n_cr,
+    /opt/odoo12/extra-addons/sus-addons-personalizados
 
 Guardar cambios y reiniciar odoo
+sudo service odoo12 restart
 
 ** SALIR de la terminal de ubuntu
 exit y ENTER
