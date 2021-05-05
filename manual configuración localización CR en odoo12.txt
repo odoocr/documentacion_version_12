@@ -10,7 +10,7 @@ Abrir sesión en odoo 12 para continuar
 Instalar los módulos base personalizados para su instancia
 
 04. Instalación de los módulos FE CR
-	Actualizar o instalar en este orden l10n_cr_country_codes, 110n_cr, l10n_cr_hacienda_info_query, cr_electronic_invoice, cr_electronic_invoice_pos, cr_electronic_invoice_qweb_fe y por último res_currency_cr_adapter
+	Actualizar o instalar en este orden l10n_cr_country_codes, l10n_cr, l10n_cr_hacienda_info_query, cr_electronic_invoice, cr_electronic_invoice_pos, cr_electronic_invoice_qweb_fe y por último res_currency_cr_adapter
 
 05. Configurar el usuario administrador
 	Habilitar en permisos de acceso:
@@ -19,15 +19,15 @@ Instalar los módulos base personalizados para su instancia
 
 	Duplicar el usuario admin y eliminar los permisos para usuario administrador (cliente), crear las plantillas para cajeros y contador, entre otros.
 	Configurar PIN de seguridad en la pestaña de terminal de punto de venta si es requerido
-	Hacer esto para cada usuario de la lista de acceso tpv.
+	Hacer esto en cada usuario.
 
-06. Modificar la compañia
-	Llenar tipo de identificación y el NIF, luego presionar el botón de "Consultar Actividad Económica en Hacienda", despues seleciconar la actividad económica principal a utilizar.
-	Completar la demas información de la compañía y guardar los cambios.
+06. Modificar la compañía
+	Llenar tipo de identificación y el NIF, luego presionar el botón de "Consultar Actividad Económica en Hacienda", después seleciconar la actividad económica principal a utilizar.
+	Completar la demás información de la compañía y guardar los cambios.
 	En la pestaña de FACTURA ELECTRONICA, subir la llave criptográfica, completar los datos de usuario, clave y pin
 	En AMBIENTE, seleccionar el indicado
-	*** El botón de test get token no refleja ningún dato a la vista, ni en el log ***
-	En default nomenclature agregar al patrón del código de barras las 2 o 3 primeras letras del nombre de la regla o tipo, Ej. Lot barcodes = LOT10
+	*** El botón de test get token no refleja ningún dato a la vista si el usuario y clave de la llave son correctos (no se valida el PIN) ***
+	En default nomenclature agregar al patrón del código de barras las 2 o 3 primeras letras del nombre de la regla o tipo, Ej. Lot barcodes = LOT10 (esto es opcional)
 
 	En TECNICO, ir a SERVIDORES DE CORREO SALIENTE, configurar la cuenta de correo con los siguientes datos:
 	DESCRIPCION: Factura (nombre del comercio)		PRIORIDAD: 10
@@ -48,7 +48,7 @@ Instalar los módulos base personalizados para su instancia
 	OPCIONES GENERALES
 		Cambiar el tamaño de la hoja a US Letter
 		Seleccionar plantilla de documento para documentos y reportes varios, editar si es necesario
-		Seleccionar el formato deseado y editar el pie de pagina (si es necesario)
+		Seleccionar el formato deseado y editar el pie de pagina (opcional)
 		Correos digestos (opcional)
 		Permisos de acceso (configurar dichos permisos - opcional)
 		Reiniciar contraseña (opcional)
@@ -59,7 +59,7 @@ Instalar los módulos base personalizados para su instancia
 	Agregar los impuestos y posiciones fiscales de SIN SERVICIO y EXONERACIONES (opcionales)
 	** Puede asignar la posición fiscal y la exoneración a los clientes que así lo requieran
 	** Para esto ver el punto # 13
-	
+
 	Impuesto de servicio
 	I. Crear impuesto SIN SERVICIO 10%
 		a. Crear el impuesto nombre: Sin Servicio
@@ -90,13 +90,20 @@ Instalar los módulos base personalizados para su instancia
 		c. En impuesto sobre el producto, seleccionar IVA 13%
 		d. En impuestos para aplicar, seleccionar IVA 13% Exonerado al (100%)
 		e. Todo lo demás queda como esta y guardar
-	
+
+	Exento no sujeto
+	I. Crear la posición fiscal para la exoneración de no sujeto
+	    a. Poner el nombre Exento no sujeto
+		b. En mapeo de impuestos agregar un registro
+		c. En impuesto sobre el producto, seleccionar IVA 13%
+		d. En impuestos para aplicar, seleccionar IVA 0%
+
 	Configurar en la terminal
 		a. Ir Terminal Punto de Venta - Configuración - Terminal Punto de Venta
 		b. Entrar a la terminal a configurar
 		c. En la sección de impuestos
 			Habilitar la opción de Posición fiscal por pedido
-			Luego seleccionar las exoneraciones creadas y/o Sin Servicio
+			Luego seleccionar las posiciones fiscales creadas
 
 09. CONFIGURACION PARA FACTURACION
 	A- SECUENCIAS PARA FACTURACION
@@ -126,7 +133,7 @@ Instalar los módulos base personalizados para su instancia
 		En Branch asignar el número de sucursal
 		En Terminal asignar el número correspondiente
 		Ejemplo puede usar para facturación Sucursal 1 y para terminal 1, para POS sucursal 1 terminal 2
-	En la pestaña de asientos contables (consecutivo interno)
+	En la pestaña de asientos contables (OPCIONAL para el consecutivo interno)
 		Código corto: FACT
 		Asignar el próximo número (consecutivo interno)
 		Modificar los valores de INV Secuencia, cambiar nombre a FACT Secuencia, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
@@ -137,7 +144,7 @@ Instalar los módulos base personalizados para su instancia
 	Guardar los cambios
 
 	II. FACTURAS DE PROVEEDOR
-	En la pestaña de asientos contables (consecutivo interno)
+	En la pestaña de asientos contables (OPCIONAL para el consecutivo interno)
 		Código corto: FPROV
 		Asignar el próximo número
 		Modificar los valores de FPROV Secuencia, borrar prefijo, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
@@ -180,7 +187,7 @@ Instalar los módulos base personalizados para su instancia
 		En Terminal asignar el número correspondiente
 		Ejemplo puede usar para la caja 1 Sucursal 1 y para terminal 2, para la caja 2 sucursal 1 terminal 3 y así sucesivamente
 		** Verificar la sucursal y terminal en el prefijo de las secuencias de POS **
-	En la pestaña de asientos contables (consecutivo interno)
+	En la pestaña de asientos contables (OPCIONAL para el consecutivo interno)
 		Código corto: FPOS
 		Asignar el próximo número
 		Modificar los valores de FPOS Secuencia, sustituir prefijo por: Caja-1/, tamaño de secuencia 10 y desmarcar utilizar subsecuencias por date_range, guardar los cambios y regresar al diario
@@ -207,14 +214,20 @@ Instalar los módulos base personalizados para su instancia
 
 12. Configuraciones varias
 	Ir a la configuración de la terminal POS, en la sección FACTURAS Y RECIBOS, desmarcar la opción de FACTURACION (esto deshabilita el botón en POS)
-	En moneda modificar el factor de redondeo deseado
+	En moneda modificar el factor de redondeo deseado Ej para 2 decimales: 0,010000
 	En precisión decimal cambiar la cantidad de decimales por cada item según lo requiera (ej: 2 en todos y mantener 15 para currency rate)
 
-13. Clientes exonerados - Establecido por default al 100% del IVA 13% - Agregar mas si es requerido
-	Crear o modificar el cliente 
-		a. Marcar la opción HAS EXONERATION (esto habilitará las opciones de la exoneración)
-		b. En la pestaña de VENTAS Y COMPRAS agregar la posición fiscal correspondiente a la exoneración
-		c. En la pestaña EXONERATION completar todos los campos según la autorización de exonet
+13. Clientes exonerados y no sujetos
+    I.  Cliente Exonerado
+	    Crear o modificar el cliente
+		    a. Marcar la opción HAS EXONERATION (esto habilitará las opciones de la exoneración)
+		    b. En la pestaña de VENTAS Y COMPRAS agregar la posición fiscal correspondiente a la exoneración
+	   	    c. En la pestaña EXONERATION completar todos los campos según la autorización de exonet
+        Al asignar el cliente se seleccionará automaticamente la posición fiscal IVA Exonerado al 100%
+    II. Cliente no sujeto
+        Crear o modificar el cliente
+		    a. En la pestaña de VENTAS Y COMPRAS agregar la posición fiscal Exento no sujeto
+        Al asignar el cliente se seleccionará automaticamente la posición fiscal Exento no sujeto
 
 14. Configurar módulo de asistencia empleados
 	Ir a aplicaciones e instalar el módulo ASISTENCIAS
