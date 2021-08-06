@@ -55,6 +55,55 @@ sudo service odoo12 restart
 
 ** SALIR de la terminal de ubuntu
 exit y ENTER
+--------------------------------------------------------------------------------------
+******* SOLO PARA PRODUCCION CON PROXY *******
+Instalar apache2 o nginx (opcional según sus requerimientos)
+Para este instructivo usaremos apache2
+sudo apt install apache2 -y
+a2enmod proxy
+a2enmod proxy_http
+a2enmod headers
+
+sudo service apache2 restart
+
+*Para tener varias bases de datos en la misma instancia primero hacer el direccionamiento DNS
+en su host, cloudflare o el servicio que utilice
+** Recordar que se esta usando apache2 no nginx **
+
+Agregar nuva BD
+cd /etc/apache2/sites-available/
+sudo nano COMPAÑIA.TUDOMINIO.com.conf
+
+**pegar los datos del VIRTUALHOST y modificar la compañia
+
+<VirtualHost *:80>
+        ServerName COMPAÑIA.TUDOMINIO.com
+        ServerAlias COMPAÑIA.TUDOMINIO.com
+
+        ProxyPass  / http://localhost:8069/
+        ProxyPassReverse  / http://localhost:8069/
+
+        Header add X-ODOO_DBFILTER "COMPAÑIA"
+        RequestHeader add X-ODOO_DBFILTER "COMPAÑIA"
+
+        #RewriteEngine on
+        #RewriteCond %{SERVER_NAME} =COMPAÑIA.TUDOMINIO.com
+       # RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+PARA GUARDAR Y CERRAR
+
+Habilitar sitio web en apache2
+sudo a2ensite COMPAÑIA.TUDOMINIO.com.conf
+
+Luego reiniciar apache2
+sudo service apache2 reload
+
+Para deshabilitar un sitio web en apache2
+sudo a2dissite COMPAÑIA.TUDOMINIO.com.conf
+
+** SALIR de la terminal de ubuntu
+exit y ENTER
 
 #################################################################
 
