@@ -1,13 +1,14 @@
-ODOO 12 LOCAL HOST o VPS (Desarrollo o Producción) Update 17-10-2020
+ODOO 12 LOCAL HOST o VPS (Desarrollo o Producción) Update 2021-07-12
 
 Instalar odoo 12 y servicios necesarios para la localización de CR
 ** La guía para desinstalar odoo esta al final de este instructivo **
 
 Se recomienda altamente NO instalar odoo con el usuario root en un VPS cloud, ver el archivo de recomendaciones
 
-1. Crear un servidor en su proveedor de servicios con ubuntu 18.04, 19.04 o 20.04
-Actualizar ubuntu
-sudo apt-get update && sudo apt-get upgrade -y
+1. Crear un servidor en su proveedor de servicios con Ubuntu 18.04, o 20.04 o Debian 10
+Actualizar Debian/Ubuntu
+# apt install lsb-release sudo
+sudo apt-get update && sudo apt-get dist-upgrade -y
 
 2. Instalar odoo12
 Entrar al servidor o ir a la terminal local
@@ -17,9 +18,17 @@ sudo git clone https://github.com/odoocr/documentacion_version_12.git
 Configurar los permisos del archivo
 sudo chmod +x odoo12.sh
 
-Ejecutar el archivo
-./odoo12.sh
-Darle Y o S y luego ENTER
+Ejecutar el archivo, opcionalmente pasando 3 parámetros
+
+    ./odoo12.sh
+
+Esto instala una instancia llamada odoo12 en el puerto 8069
+
+Para configurar una extra
+
+    ./odoo12.sh 12 testing 8070
+
+Esto instala una instancia llamada odoo12testing en el puerto 8070
 
 *** si es instalación local para desarrollo, deshabilitar el inicio automatico de odoo ***
 sudo service odoo12 stop
